@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# sleep.sh - Called when the system goes to sleep
+# Records the current sleep timestamp
+
+# Create log directory if it doesn't exist
+LOG_DIR="$HOME/.mac_sleep_fix"
+mkdir -p "$LOG_DIR"
+
+# Record sleep timestamp
+date +%s > "$LOG_DIR/last_sleep_timestamp"
+
+# Log the event
+echo "Sleep triggered at $(date)" >> "$LOG_DIR/sleep_wake.log" 

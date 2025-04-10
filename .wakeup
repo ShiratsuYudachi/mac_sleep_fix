@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# wake.sh - Called when the system wakes up
+# Checks if the system woke up soon after sleeping (potential lid sensor issue)
+# If so, triggers forced sleep after a short delay
+
+# Create log directory if it doesn't exist
+LOG_DIR="$HOME/.mac_sleep_fix"
+mkdir -p "$LOG_DIR"
+
+# Record wake timestamp
+WAKE_TIME=$(date +%s)
+echo "$WAKE_TIME" > "$LOG_DIR/last_wake_timestamp"
+
+# Check if there was a previous sleep timestamp
+if [ -f "$LOG_DIR/last_sleep_timestamp" ]; then
+    SLEEP_TIME=$(cat "$LOG_DIR/last_sleep_timestamp")
+    TIME_DIFF=$((WAKE_TIME - SLEEP_TIME))
+    
+    # Log the wake event with time difference
+    echo "Wake triggered at $(date), $TIME_DIFF seconds after sleep" >> "$LOG_DIR/sleep_wake.log"
+    
+    # If system woke up within 3 seconds of sleeping, likely a lid sensor issue
+    if [ "$TIME_DIFF" -le 1 ]; then
+        echo "Detected lid sensor issue - wake happened $TIME_DIFF seconds after sleep" >> "$LOG_DIR/sleep_wake.log"
+        echo "Triggering forced sleep in 5 seconds..." >> "$LOG_DIR/sleep_wake.log"
+        
+        # Use launchctl to schedule the sleep command with sudo privileges
+        # This requires sudo without password setup for shutdown command
+        (sleep 3 && sudo shutdown -s now) &
+    fi
+else
+    # Log the wake event without time difference
+    echo "Wake triggered at $(date), no previous sleep timestamp found" >> "$LOG_DIR/sleep_wake.log"
+fi 
