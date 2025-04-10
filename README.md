@@ -21,7 +21,7 @@ Two scripts work together with `sleepwatcher` to detect and fix this issue:
 
 1. Install sleepwatcher via Homebrew:
    ```
-   brew install sleepwatcher
+   HOMEBREW_NO_INSTALL_FROM_API=1 brew install sleepwatcher
    ```
 
 2. Place these scripts in a location of your choice (e.g., `~/scripts/`):
